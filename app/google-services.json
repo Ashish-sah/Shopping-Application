@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "996979780770",
+    "project_id": "e-commerce-app-17a45",
+    "storage_bucket": "e-commerce-app-17a45.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:996979780770:android:ff9771107a616f885dbbfb",
+        "android_client_info": {
+          "package_name": "com.ashish.ecommerceapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "996979780770-5mgh2pvi5ed0qcdq3p9rqnu8uh5kd24u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvKn8J-w9svX06nIabC4TSDweG03Eu_Yw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "996979780770-5mgh2pvi5ed0qcdq3p9rqnu8uh5kd24u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
