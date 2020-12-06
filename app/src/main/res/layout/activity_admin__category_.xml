@@ -13,6 +13,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="27dp"
         android:text="Add New Product"
+        android:textColor="@color/purple_500"
         android:textAlignment="center"
         android:textSize="26sp"
         android:textStyle="bold" />
