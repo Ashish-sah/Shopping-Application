@@ -2,15 +2,24 @@ package com.ashish.ecommerceapp.Model;
 
 public class Users {
 
-    private String name, password, phone;
+    private String name, password, phone, email;
 
     public Users() {
     }
 
-    public Users(String name, String password, String phone) {
+    public Users(String name, String password, String phone, String email) {
         this.name = name;
+        this.email = email;
         this.password = password;
         this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getName() {

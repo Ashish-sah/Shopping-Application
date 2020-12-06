@@ -23,7 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 
 public class RegisterActivity extends AppCompatActivity {
-    EditText registerUserName, registerUserPassword, registeruserPhonenumber;
+    EditText registerUserName, registerUserPassword, registeruserPhonenumber, registerUserEmail;
     Button registerCreateAccount;
     ProgressDialog loading;
 
@@ -35,6 +35,7 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registry);
         registerUserName = (EditText) findViewById(R.id.register_username_input);
+        registerUserEmail = (EditText) findViewById(R.id.register_email_input);
         registerUserPassword = (EditText) findViewById(R.id.register_password_input);
         registeruserPhonenumber = (EditText) findViewById(R.id.register_phonenumber_input);
         registerCreateAccount = (Button) findViewById(R.id.register_btn);
@@ -58,6 +59,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void validateUser() {
         String name = registerUserName.getText().toString().trim();
+        String email = registerUserEmail.getText().toString().trim();
         String password = registerUserPassword.getText().toString().trim();
         String phone = registeruserPhonenumber.getText().toString().trim();
         // databaseReference.setValue("ashi");
@@ -68,6 +70,9 @@ public class RegisterActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(name)) {
             loading.dismiss();
             Toast.makeText(this, "Please write your name...", Toast.LENGTH_SHORT).show();
+        } else if (TextUtils.isEmpty(email)) {
+            loading.dismiss();
+            Toast.makeText(this, "Please write your email address...", Toast.LENGTH_SHORT).show();
         } else if (TextUtils.isEmpty(phone)) {
             loading.dismiss();
             Toast.makeText(this, "Please write your phone number...", Toast.LENGTH_SHORT).show();
@@ -90,6 +95,7 @@ public class RegisterActivity extends AppCompatActivity {
                     } else {
                         HashMap<String, Object> userdataMap = new HashMap<>();
                         userdataMap.put("phone", phone);
+                        userdataMap.put("email", email);
                         userdataMap.put("password", password);
                         userdataMap.put("name", name);
 
