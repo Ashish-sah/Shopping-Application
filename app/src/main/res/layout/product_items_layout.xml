@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_below="@+id/product_name"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="5dp"
             android:scaleType="centerCrop" />
 
         <TextView
@@ -35,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/product_image"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="4dp"
             android:text="Product Price"
             android:textAlignment="center"
             android:textColor="@color/purple_200"
@@ -47,6 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/product_price"
             android:text="Product Description"
+            android:layout_marginTop="4dp"
             android:textAlignment="center"
             android:textColor="@color/purple_200"
             android:textSize="16dp" />
