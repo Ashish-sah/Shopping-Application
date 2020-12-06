@@ -34,13 +34,19 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    testImplementation 'junit:junit:4.+'
+    implementation 'androidx.navigation:navigation-ui:2.3.2'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
+    testImplementation 'junit:junit:4.13.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+
     // Import the Firebase library
     implementation platform('com.google.firebase:firebase-bom:26.1.0')
     implementation 'com.google.firebase:firebase-database:19.5.1'
     implementation 'com.google.firebase:firebase-storage'
+    // FirebaseUI for Firebase Realtime Database
+    implementation 'com.firebaseui:firebase-ui-database:7.1.1'
 
     //This  library for material design
     implementation 'com.github.rey5137:material:1.2.5'
@@ -52,5 +58,11 @@ dependencies {
 
     //Timber library to show messages in log cat  mainly replacement of Log
     implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    //Circle Image View Library
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+
+    //Picasso Library
+    implementation 'com.squareup.picasso:picasso:2.71828'
 
 }
