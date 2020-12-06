@@ -27,7 +27,7 @@ import io.paperdb.Paper;
 public class LoginActivity extends AppCompatActivity {
     FirebaseDatabase database;
     DatabaseReference databaseReference;
-    private EditText InputPhoneNumber, InputPassword;
+    private EditText InputPhoneNumber, InputPassword, InputEmail;
     private Button LoginButton;
     private ProgressDialog loadingBar;
     private TextView AdminLink, NotAdminLink;
@@ -39,6 +39,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         LoginButton = (Button) findViewById(R.id.login_btn);
+        InputEmail = (EditText) findViewById(R.id.login_email_input);
         InputPassword = (EditText) findViewById(R.id.login_password_input);
         InputPhoneNumber = (EditText) findViewById(R.id.login_phone_number_input);
         AdminLink = (TextView) findViewById(R.id.admin_panel_link);
@@ -82,9 +83,11 @@ public class LoginActivity extends AppCompatActivity {
     private void LoginUser() {
         String phone = InputPhoneNumber.getText().toString().trim();
         String password = InputPassword.getText().toString().trim();
-
+        String email = InputEmail.getText().toString().trim();
         if (TextUtils.isEmpty(phone)) {
             Toast.makeText(this, "Please write your phone number...", Toast.LENGTH_SHORT).show();
+        } else if (TextUtils.isEmpty(email)) {
+            Toast.makeText(this, "Please write your email address...", Toast.LENGTH_SHORT).show();
         } else if (TextUtils.isEmpty(password)) {
             Toast.makeText(this, "Please write your password...", Toast.LENGTH_SHORT).show();
         } else {
@@ -92,14 +95,15 @@ public class LoginActivity extends AppCompatActivity {
             loadingBar.setMessage("Please wait, while we are checking the credentials.");
             loadingBar.setCanceledOnTouchOutside(false);
             loadingBar.show();
-            AllowAccessToAccount(phone, password);
+            AllowAccessToAccount(phone, password, email);
         }
     }
 
-    private void AllowAccessToAccount(String phone, String password) {
+    private void AllowAccessToAccount(String phone, String password, String email) {
         //storing the value inside prevalent variables if check box is checked
         if (chkBoxRememberMe.isChecked()) {
             Paper.book().write(Prevalent.UserPhoneKey, phone);
+            Paper.book().write(Prevalent.UserEmailKey, email);
             Paper.book().write(Prevalent.UserPasswordKey, password);
         }
 
@@ -110,29 +114,37 @@ public class LoginActivity extends AppCompatActivity {
                     Users userData = snapshot.child(parentDbName).child(phone).getValue(Users.class);
                     assert userData != null;
                     if (userData.getPhone().equals(phone)) {
-                        if (userData.getPassword().equals(password)) {
-                            if (parentDbName.equals("Admins")) {
-                                Toast.makeText(getApplicationContext(), "Welcome Admin you are Logged In Successfully", Toast.LENGTH_SHORT).show();
-                                loadingBar.dismiss();
-                                Intent inten = new Intent(LoginActivity.this, Admin_Category_Activity.class);
-                                startActivity(inten);
-                                finish();
-                            } else if (parentDbName.equals("Users")) {
-                                Toast.makeText(getApplicationContext(), "Logged In Successfully", Toast.LENGTH_SHORT).show();
-                                loadingBar.dismiss();
-                                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-                                Prevalent.currentOnlineUser = userData;
-                                startActivity(intent);
-                                finish();
+                        if (userData.getEmail().equals(email)) {
+                            if (userData.getPassword().equals(password)) {
+                                if (parentDbName.equals("Admins")) {
+                                    Toast.makeText(getApplicationContext(), "Welcome Admin you are Logged In Successfully", Toast.LENGTH_SHORT).show();
+                                    loadingBar.dismiss();
+                                    Intent inten = new Intent(LoginActivity.this, Admin_Category_Activity.class);
+                                    startActivity(inten);
+                                    finish();
+                                } else if (parentDbName.equals("Users")) {
+                                    Toast.makeText(getApplicationContext(), "Logged In Successfully", Toast.LENGTH_SHORT).show();
+                                    loadingBar.dismiss();
+                                    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                                    Prevalent.currentOnlineUser = userData;
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    loadingBar.dismiss();
+                                    Toast.makeText(getApplicationContext(), "DETAILS INCORRECT number :" + phone
+                                            + " password = " + password, Toast.LENGTH_LONG).show();
+                                }
                             } else {
                                 loadingBar.dismiss();
-                                Toast.makeText(getApplicationContext(), "DETAILS INCORRECT number :" + phone
-                                        + " password = " + password, Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "Password is incorrect", Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             loadingBar.dismiss();
-                            Toast.makeText(getApplicationContext(), "Password is incorrect", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Email is incorrect", Toast.LENGTH_SHORT).show();
                         }
+                    } else {
+                        loadingBar.dismiss();
+                        Toast.makeText(getApplicationContext(), "Password is incorrect", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), "Account with this " + phone + " doesn't exist ", Toast.LENGTH_SHORT).show();

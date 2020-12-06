@@ -61,10 +61,10 @@ public class MainActivity extends AppCompatActivity {
         //retrieve the user
         String UserPhoneKey = Paper.book().read(Prevalent.UserPhoneKey);
         String UserPasswordKey = Paper.book().read(Prevalent.UserPasswordKey);
-
+        String UserEmailKey = Paper.book().read(Prevalent.UserEmailKey);
         if (UserPhoneKey != "" && UserPasswordKey != "") {
-            if (!TextUtils.isEmpty(UserPhoneKey) && !TextUtils.isEmpty(UserPasswordKey)) {
-                AllowAccess(UserPhoneKey, UserPasswordKey);
+            if (!TextUtils.isEmpty(UserPhoneKey) && !TextUtils.isEmpty(UserPasswordKey) && !TextUtils.isEmpty(UserEmailKey)) {
+                AllowAccess(UserPhoneKey, UserPasswordKey, UserEmailKey);
 
                 loadingBar.setTitle("Already Logged in");
                 loadingBar.setMessage("Please wait.....");
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //This allow to open
-    private void AllowAccess(String phone, String password) {
+    private void AllowAccess(String phone, String password, String email) {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -84,18 +84,26 @@ public class MainActivity extends AppCompatActivity {
                     Users userData = snapshot.child("Users").child(phone).getValue(Users.class);
                     Timber.e("There is some error");
                     if (userData.getPhone().equals(phone)) {
-                        if (userData.getPassword().equals(password)) {
-                            Timber.d("Data is  added ");
-                            Toast.makeText(MainActivity.this, "Please wait, you are already logged in...", Toast.LENGTH_SHORT).show();
-                            loadingBar.dismiss();
+                        if (userData.getEmail().equals(email)) {
+                            if (userData.getPassword().equals(password)) {
+                                Timber.d("Data is  added ");
+                                Toast.makeText(MainActivity.this, "Please wait, you are already logged in...", Toast.LENGTH_SHORT).show();
+                                loadingBar.dismiss();
 
-                            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-                            startActivity(intent);
-                            finish();
+                                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                loadingBar.dismiss();
+                                Toast.makeText(MainActivity.this, "Password is incorrect.", Toast.LENGTH_SHORT).show();
+                            }
                         } else {
                             loadingBar.dismiss();
-                            Toast.makeText(MainActivity.this, "Password is incorrect.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "Email is incorrect.", Toast.LENGTH_SHORT).show();
                         }
+                    } else {
+                        loadingBar.dismiss();
+                        Toast.makeText(MainActivity.this, "Phone Number is incorrect.", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), "Account with this " + phone + " doesn't exist ", Toast.LENGTH_SHORT).show();
