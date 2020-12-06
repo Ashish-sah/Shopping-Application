@@ -13,6 +13,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.ashish.ecommerceapp.Model.Users;
 import com.ashish.ecommerceapp.Prevalent.Prevalent;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,6 +38,8 @@ public class LoginActivity extends AppCompatActivity {
     private TextView AdminLink, NotAdminLink;
     private String parentDbName = "Users";
     private CheckBox chkBoxRememberMe;
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +55,11 @@ public class LoginActivity extends AppCompatActivity {
         chkBoxRememberMe = (CheckBox) findViewById(R.id.remember_me_chkb);
         //This library write the user information to android memory
         Paper.init(this);
+        firebaseAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference();
+        firebaseUser = firebaseAuth.getCurrentUser();
+
         LoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,12 +133,28 @@ public class LoginActivity extends AppCompatActivity {
                                     startActivity(inten);
                                     finish();
                                 } else if (parentDbName.equals("Users")) {
-                                    Toast.makeText(getApplicationContext(), "Logged In Successfully", Toast.LENGTH_SHORT).show();
-                                    loadingBar.dismiss();
-                                    Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-                                    Prevalent.currentOnlineUser = userData;
-                                    startActivity(intent);
-                                    finish();
+                                    firebaseAuth.signInWithEmailAndPassword(email, password)
+                                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                                    if (task.isSuccessful()) {
+                                                        if (firebaseUser.isEmailVerified()) {
+                                                            Toast.makeText(getApplicationContext(), "Logged In Successfully", Toast.LENGTH_SHORT).show();
+                                                            loadingBar.dismiss();
+                                                            Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                                                            Prevalent.currentOnlineUser = userData;
+                                                            startActivity(intent);
+                                                            finish();
+                                                        } else {
+                                                            loadingBar.dismiss();
+                                                            Toast.makeText(LoginActivity.this, "please verify your email address", Toast.LENGTH_LONG).show();
+                                                        }
+                                                    } else {
+                                                        loadingBar.dismiss();
+                                                        Toast.makeText(LoginActivity.this, "Login Failed", Toast.LENGTH_LONG).show();
+                                                    }
+                                                }
+                                            });
                                 } else {
                                     loadingBar.dismiss();
                                     Toast.makeText(getApplicationContext(), "DETAILS INCORRECT number :" + phone

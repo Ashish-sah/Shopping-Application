@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,7 +28,7 @@ public class RegisterActivity extends AppCompatActivity {
     EditText registerUserName, registerUserPassword, registeruserPhonenumber, registerUserEmail;
     Button registerCreateAccount;
     ProgressDialog loading;
-
+    FirebaseAuth firebaseAuth;
     FirebaseDatabase database;
     DatabaseReference databaseReference;
 
@@ -43,7 +45,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference().child("Users");
-
+        firebaseAuth = FirebaseAuth.getInstance();
         registerCreateAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,39 +85,58 @@ public class RegisterActivity extends AppCompatActivity {
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    //to avoid redundancy in database
+                    //to avoid redundancy of same phone number in database
                     if (dataSnapshot.child(phone).exists()) {
                         Toast.makeText(RegisterActivity.this, "This " + phone + " already exists.", Toast.LENGTH_SHORT).show();
                         loading.dismiss();
                         Toast.makeText(RegisterActivity.this, "Please try again using another phone number.", Toast.LENGTH_SHORT).show();
 
-                        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
                     } else {
-                        HashMap<String, Object> userdataMap = new HashMap<>();
-                        userdataMap.put("phone", phone);
-                        userdataMap.put("email", email);
-                        userdataMap.put("password", password);
-                        userdataMap.put("name", name);
+                        //check for duplicacy of email and than add the data to database
+                        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    firebaseAuth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                //Adding data to database
+                                                HashMap<String, Object> userdataMap = new HashMap<>();
+                                                userdataMap.put("phone", phone);
+                                                userdataMap.put("email", email);
+                                                userdataMap.put("password", password);
+                                                userdataMap.put("name", name);
 
-                        databaseReference.child(phone).updateChildren(userdataMap)
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            Toast.makeText(RegisterActivity.this, "Congratulations, your account has been created.", Toast.LENGTH_SHORT).show();
-                                            loading.dismiss();
+                                                databaseReference.child(phone).updateChildren(userdataMap)
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    Toast.makeText(RegisterActivity.this, "Congratulations, your account has been created. Check Email to verify", Toast.LENGTH_SHORT).show();
+                                                                    loading.dismiss();
 
-                                            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                                            startActivity(intent);
-                                            finish();
-                                        } else {
-                                            loading.dismiss();
-                                            Toast.makeText(RegisterActivity.this, "Network Error: Please try again after some time...", Toast.LENGTH_SHORT).show();
+                                                                    Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                                                                    startActivity(intent);
+                                                                    finish();
+                                                                } else {
+                                                                    loading.dismiss();
+                                                                    Toast.makeText(RegisterActivity.this, "Network Error: Please try again after some time...", Toast.LENGTH_SHORT).show();
+                                                                }
+                                                            }
+                                                        });
+                                            } else {
+                                                loading.dismiss();
+                                                Toast.makeText(RegisterActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                                } else {
+                                    loading.dismiss();
+                                    Toast.makeText(RegisterActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
                     }
                 }
 
@@ -126,6 +147,7 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(RegisterActivity.this, databaseError.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
+
         }
     }
 }
